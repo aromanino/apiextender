@@ -163,7 +163,7 @@ where:
         +   error : If an error occurs in your extender function, you can throw it to apiexender setting error object as an object containing
                     two keys :
             +   **error_code**      : containing the http status code to send to the client(es 204, 400, 404, 500).
-                **error_message**   : containing a message to send to the client.   
+            +   **error_message**   : containing a message to send to the client.   
                     If error is not **null** apiextender stops the request execution and send a response to the client with this object error.
         +   newContent : The new content to send to the client if the mode is set to "override", "after" or "before_after", or the content to
                          add to the express request param 
