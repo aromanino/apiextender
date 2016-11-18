@@ -90,6 +90,6 @@ exports.extend=function(app){
         extendGet(app,ext.method,ext);
         callback();
     });
-}
+};
 
 
