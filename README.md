@@ -167,8 +167,7 @@ where:
                          add to the express request(req) to be thrown to apiextender if  mode is set to "before".
     
 
-**<a name="nb">`NB`:**  If **mode** is set to "before_after", is mandatory to declare in **extender** param two function, one for actions "before" and one other 
-for actions "after". So the "**extender**" parameter is not a declaration function but an object containing two keys: </a>
+####<a name="nb"></a> `NB`: If mode is set to "before_after", is mandatory to declare in extender param two function, one for actions "before" and one other for actions "after". So the "**extender**" parameter is not a declaration function but an object containing two keys: 
 +   **before**: the function declaration for "before" actions
 +   **after** : the function declaration for "after" actions
 
