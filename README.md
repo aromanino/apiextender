@@ -8,14 +8,10 @@ apiextender let to :
 
 * [Installation](#installation) 
 * [Using apiextender](#using)
-* [make your environment capable to accept plugins functions](#folder)
 * [Reference](#reference) 
+    * [extend(app)](#extend)
+* [make your environment capable to accept plugins functions](#folder)
 * [How to write function that extends the "API"](#howto)
-    * [File properties creation](#creation)
-* [File properties population](#populate)
-
-* [Loading production or dev or test parameters](#load)
-* [Ovverride parameters from command line](#override)
 * [Examples](#examples)
     
 
@@ -116,7 +112,7 @@ var plugins=[
         }
     },             
     {
-        "resource":"/OtherresourceToExtend",
+        "resource":"/OtherResourceToExtend",
         "method":"GET",
         "mode":"before",
         "params":[query],
@@ -149,27 +145,56 @@ where:
     +   **override**    : override the original endpoint definition.
     +   **before**      : the extension function is executed before the endpoint to extend.
     +   **after**       : the extension function is executed after the endpoint to extend.
-    +   **before_after**: the extension function is executed before and after the endpoint to extend.
-+   **params**  : An array of strings containing the list or express "request" params to pass at the extender function 
+    +   **before_after**: the extension function is executed before and after the endpoint to extend. VERY IMPORTANT --> [Read the note Well](#nb) 
++   **params**  : An array of strings containing the list or express "request" params to pass at the extender function in the reqParams param.
 +   **extender**: Extender function definition with which to extend the endpoint. This function is invoked end executed by 
                   apiextender, and is defined as:  
                   **function(reqParams,content,contentType,callback)**
     +   **reqParams**   : An Object containing the express request params defined in "params" field. For example if :  
-                        params=["query"] ---> it contains an object as {query:QueryParams} where QueryParams==req.params.
+                        params=["query"] ---> it contains an object as {query:QueryParams} where QueryParams==req.query.
     +   **content**     : Contains the content of the original endpoint response when "mode" param is set to "after" or "before_after".  
                           It is "null" when mode is set to "override" or "before".
     +   **contentType** : String that describe the contentType in content. For example "application/json" , "text/html" , "text/css" ...  
                           It is "null" when mode is set to "override" or "before".  
     +   **callback**    : callback function to apiextender. It must be invoked with two params **"error"** and **"newContent"**  
-                          **callback(error,newContent)**
-        +   error : If an error occurs in your extender function, you can throw it to apiexender setting error object as an object containing
+                          The function **callback(error,newContent)** definition
+        +   error : If an error occurs in your extender function, you can throw it to apiexender setting error as an object containing
                     two keys :
             +   **error_code**      : containing the http status code to send to the client(es 204, 400, 404, 500).
             +   **error_message**   : containing a message to send to the client.   
-                    If error is not **null** apiextender stops the request execution and send a response to the client with this object error.
+                    If error is not **null** when callback is invoked, apiextender stops the request execution and send a response to the client with this object error.
         +   newContent : The new content to send to the client if the mode is set to "override", "after" or "before_after", or the content to
-                         add to the express request param 
+                         add to the express request(req) to be thrown to apiextender if  mode is set to "before".
     
+
+**<a name="nb">`NB`:</a>**  If mode is set to "before_after", is mandatory to declare in extender param two function, one for actions "before" and one other 
+for actions "after". So the "**extender**" parameter is not a declaration function but an object containing two keys: 
++   **before**: the function declaration for "before" actions
++   **after** : the function declaration for "after" actions
+
+Here an example
+```javascript
+{
+    //.... 
+    //.... 
+    "mode":"before_after"
+    "extender":{ 
+            "before": function(req,content,cType,callback){
+                // before logic
+                callback(null,{"Content extension before"});
+            },
+            "after": function(req,content,cType,callback){
+                // after logic
+                callback(null,{"Content extension after"});
+            }
+    }
+}
+``` 
+
+
+## <a name="examples"></a>`Examples`
+
+### File Properties creation
 
 License - "MIT License"
 -----------------------
