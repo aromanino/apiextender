@@ -48,6 +48,12 @@ var app=express();
 apiextender.extend(app);  // now your API is exensible
 ```
 
+## <a name="reference"></a>Reference
+### <a name="extend"></a>`extend(app)` 
+This is the function that allow to make your "API" extensible. 
+The param `app` is the application that you want extend.  
+
+
 ## <a name="folder"></a>Make your environment capable to accept plugins functions
 Plugin functions to extend API must be defined in a file called extend.js in a folder named plugin in the home directory of your application.
 extend.js contains an array of plugin functions. 
@@ -72,10 +78,6 @@ module.exports = plugins;
 ```
 **to see how to write plugin function read the section [How to write function that extends the "API"](#howto)**
   
-## <a name="reference"></a>Reference
-### <a name="extend"></a>`extend(app)` 
-This is the function that allow to make your "API" extensible. 
-The param `app` is the application that you want extend.  
 
 ## <a name="howto"></a>How to write function that extends the "API" 
 To extend an API endpoint you must populate the extend.js file and more specifically the array plugins containing a
