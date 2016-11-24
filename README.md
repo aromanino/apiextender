@@ -324,7 +324,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make the same test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
 is not executed and overridden by extension plugin function:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal
@@ -376,7 +376,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make the same test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
 is extended by plugin function:
 ```shell 
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/beforeOriginal?username=Alex
@@ -438,7 +438,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make the same test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
 is extended by plugin function:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/afterOriginal
@@ -518,7 +518,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make the same test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
 is extended by plugin function:
 ```shell 
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/before_afterOriginal
@@ -599,7 +599,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make a test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make a test with curl. You can see that original endpoint
 is not executed after extension function if no username field is sent because "before extension function" stops execution with an error message to 
 thr apiextender callback:
 ```shell
@@ -750,7 +750,7 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application to apply plugin function extension and make the same test with curl. You can see that original endpoint
+now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
 is extended by plugin function:
 ```shell 
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal?username=Alex
