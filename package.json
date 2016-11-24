@@ -1,7 +1,6 @@
-
 {
   "name": "apiextender",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "start": "node ./bin/www"
   },
@@ -12,7 +11,32 @@
     "morgan": "~1.3.0",
     "serve-favicon": "~2.1.3",
     "debug": "~2.0.0"
-  }
+  },
+  "description": "This module deals with to extend an API backend that adds a specific feature to an existing API as plugin(add-in, addin, add-on, addon).    apiextender let to : +   enable third-party developers to create abilities which extend an application +   support easily adding new features",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aromanino/apiextender.git"
+  },
+  "keywords": [
+    "api",
+    "extend",
+    "extension",
+    "plugin",
+    "plug-in",
+    "add-in",
+    "addin",
+    "add-on",
+    "addon",
+    "upgrade",
+    "update",
+    "install",
+    "feature"
+  ],
+  "author": "Alessandro Romanino <a.romanino@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aromanino/apiextender/issues"
+  },
+  "homepage": "https://github.com/aromanino/apiextender#readme"
 }
-
-
