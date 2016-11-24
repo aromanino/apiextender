@@ -8,11 +8,11 @@ apiextender let to :
 
 * [Installation](#installation) 
 * [Using apiextender](#using)
+* [make your environment capable to accept plugins functions](#folder)
+* [How to write function that extends the "API"](#howto)
 * [Reference](#reference) 
     * [extend(app)](#extend)
     * [install(app,extender,save)](#install)
-* [make your environment capable to accept plugins functions](#folder)
-* [How to write function that extends the "API"](#howto)
 * [Examples](#examples)
     *   [Examples:How to set an API extensible by plugins](#examplesapi)   
     *   [Examples:How to write extensible plugin functions](#examplesplugin)   
@@ -53,40 +53,6 @@ var app=express();
 // and with one line of code. 
 apiextender.extend(app);  // now your API is exensible
 ```
-
-## <a name="reference"></a>Reference
-### <a name="extend"></a>`extend(app)` 
-This is the function that allow to make your "API" extensible. 
-The param `app` is the application that you want extend.  
-
-### <a name="install"></a>`install(app,extender,save)` 
-This is a function suite that allow you to extend an API at runtime without stop and restart you application.
-It lets you don't stop your application to write the plugin extender function in extender.js file.  
-The param `app` is the application that you want extend  
-The param `extender` is the extender plugin function defined as in section [plugin extender Structure](#functionextension)  
-The param `save` if "true" the extender plugin is saved in the extend.js file then it becomes permanent otherwise if "false" thr plugin function
-is installed but not saved so when application is stopped and restarted the extender plugin extension is not reloaded.
-Example:
-```javascript
-var express=require('express'); 
-var apiextender = require('apiextender');
-var app=express();
-   
-// make your API extensible by plugin techniques in a simple and fast 
-// and with one line of code. 
-apiextender.extend(app);  // now your API is exensible
-
-// Define an endpoint that wrap apiextender install function that lets you to extend API on the fly
-// The access to this endpoint should be protectd with token privileges
-app.post("/installPlugin",function(req,res,next){
-    // check for tokens
-    //.....
-     
-    apiextender.install(app,req.body.pluginExtender,req.body.save || false); 
-    res.send({"status":"installed"});    
-});
-```
-
 
 ## <a name="folder"></a>Make your environment capable to accept plugins functions
 Plugin functions to extend API must be defined in a file called extend.js in a folder named plugin in the home directory of your application.
@@ -227,6 +193,40 @@ Here an example
     }
 }
 ``` 
+
+## <a name="reference"></a>Reference
+### <a name="extend"></a>`extend(app)` 
+This is the function that allow to make your "API" extensible. 
+The param `app` is the application that you want extend.  
+
+### <a name="install"></a>`install(app,extender,save)` 
+This is a function suite that allow you to extend an API at runtime without stop and restart you application.
+It lets you don't stop your application to write the plugin extender function in extender.js file.  
+The param `app` is the application that you want extend  
+The param `extender` is the extender plugin function defined as in section [plugin extender structure](#functionextension)  
+The param `save` if "true" the extender plugin is saved in the extend.js file then it becomes permanent otherwise if "false" the plugin function
+is installed but not saved so when application is stopped and restarted the extender plugin extension is not reloaded.
+Example:
+```javascript
+var express=require('express'); 
+var apiextender = require('apiextender');
+var app=express();
+   
+// make your API extensible by plugin techniques in a simple and fast 
+// and with one line of code. 
+apiextender.extend(app);  // now your API is exensible
+
+// Define an endpoint that wrap apiextender install function that lets you to extend API on the fly
+// The access to this endpoint should be protectd with token privileges
+app.post("/installPlugin",function(req,res,next){
+    // check for tokens
+    //.....
+     
+    // install and run the plugin
+    apiextender.install(app,req.body.pluginExtender,req.body.save || false); 
+    res.send({"status":"installed"});    
+});
+```
 
 
 ## <a name="examples"></a>`Examples`
