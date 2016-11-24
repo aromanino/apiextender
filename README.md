@@ -63,7 +63,7 @@ The param `app` is the application that you want extend.
 This is a function suite that allow you to extend an API at runtime without stop and restart you application.
 It lets you don't stop your application to write the plugin extender function in extender.js file.  
 The param `app` is the application that you want extend  
-The param `extender` is the extender plugin function defined as described in section [plugin extender Structure](#functionextension)  
+The param `extender` is the extender plugin function defined as in section [plugin extender Structure](#functionextension)  
 The param `save` if "true" the extender plugin is saved in the extend.js file then it becomes permanent otherwise if "false" thr plugin function
 is installed but not saved so when application is stopped and restarted the extender plugin extension is not reloaded.
 Example:
