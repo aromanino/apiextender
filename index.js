@@ -1,6 +1,7 @@
 var plugin = require("../.././plugin/extend");
 var responseinterceptor=require('responseinterceptor');
 var async=require('async');
+var fs = require('fs');
 
 function LoadParams(params,req){
     var values={};
@@ -92,4 +93,16 @@ exports.extend=function(app){
     });
 };
 
+exports.install=function(app,extender,save){
+    extendGet(app,extender.method,extender);
+    if(save){
+        plugin.push(extender);
+        var nfile='var express = require(\'express\');' +
+                  '' +
+                  'var plugins=' + JSON.stringify(plugin);
+                  'module.exports = plugins;';
 
+        fs.writeFile("../.././plugin/extend.js", nfile, function(err) {
+        });
+    }
+};
