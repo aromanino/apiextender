@@ -236,7 +236,7 @@ From a shell, go in your application home directory and type de follow commands:
 $ cd /Your_App_Home
 $ npm install apiextender   // install apiextender
 $ mkdir plugin              // Create plugin container folder
-$ cd plugin                 // go in plugin folder
+$ cd plugin                 // go into plugin folder
 $ vi extend.js              // Create plugin container file
 ```
 
