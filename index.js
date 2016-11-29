@@ -133,8 +133,9 @@ exports.install=function(app,extender,save){
                 functionToString += ("      \"mode\":\"") + obj.mode.toString() + "\",\n";
                 functionToString +=  "      \"params\":[" ;
                 obj.params.forEach(function (value) {
-                    functionToString+="\"" + value.toString() + "\"";
+                    functionToString+="\"" + value.toString() + "\",";
                 });
+                functionToString=functionToString.slice(0,-1);
                 functionToString+="],\n";
 
                 if(obj.extender && obj.extender.before) {
