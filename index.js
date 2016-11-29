@@ -131,7 +131,7 @@ exports.install=function(app,extender,save){
                 functionToString += ("      \"resource\":\"") + obj.resource.toString() + "\",\n";
                 functionToString += ("      \"method\":\"") + obj.method.toString() + "\",\n";
                 functionToString += ("      \"mode\":\"") + obj.mode.toString() + "\",\n";
-                functionToString += ("      \"params\":\"") + obj.params.toString() + "\",\n";
+                functionToString += ("      \"params\":\"[") + obj.params.toString() + "\"],\n";
                 if(obj.extender && obj.extender.before) {
                     functionToString += ("      \"extender\":{\n");
                     functionToString += ("          \"before\":") + obj.extender.before.toString() + ",\n";
