@@ -135,7 +135,7 @@ exports.install=function(app,extender,save){
                 obj.params.forEach(function (value) {
                     functionToString+="\"" + value.toString() + "\",";
                 });
-                functionToString=functionToString.slice(0,-1);
+                if(obj.params.length>0) functionToString=functionToString.slice(0,-1);
                 functionToString+="],\n";
 
                 if(obj.extender && obj.extender.before) {
