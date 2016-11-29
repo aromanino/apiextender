@@ -62,7 +62,7 @@ function extendGet(app,method,ext) {
             next();
         } else if(ext.mode=="before_after") {
 
-            ext.extender[0](params,null,null,function (err, val) {
+            ext.extender.before(params,null,null,function (err, val) {
                 if(!err) {
                     writeParams(val, req);
                 }else{
@@ -71,7 +71,7 @@ function extendGet(app,method,ext) {
             });
 
             responseinterceptor.interceptOnFly(req,res,function(body,cType, request, clb){
-                ext.extender[1](params,body,cType,function (err, val) {
+                ext.extender.after(params,body,cType,function (err, val) {
                     if(!err) {
                         clb(val);
                     }else{
@@ -93,16 +93,67 @@ exports.extend=function(app){
     });
 };
 
-exports.install=function(app,extender,save){
-    extendGet(app,extender.method,extender);
-    if(save){
-        plugin.push(extender);
-        var nfile='var express = require(\'express\');' +
-                  '' +
-                  'var plugins=' + JSON.stringify(plugin);
-                  'module.exports = plugins;';
 
-        fs.writeFile("../.././plugin/extend.js", nfile, function(err) {
-        });
-    }
+function getErrorHandlers(app,error_map) {
+    var route, stack;
+
+    stack = app._router.stack;
+
+
+    async.eachOfSeries(stack, function(layer,key, callback) {
+        if (layer && layer.name == '<anonymous>' &&  layer.route == undefined)
+            callback(key);
+        else callback();
+
+    }, function(err_map) {
+        var error_handlers=null;
+        if(err_map){
+            error_handlers = stack.splice(err_map);
+            app._router.stack=stack;
+        }
+        error_map(error_handlers);
+    });
+}
+
+
+exports.install=function(app,extender,save){
+    getErrorHandlers(app,function(error_handlers){
+        extendGet(app,extender.method,extender);
+
+        if(error_handlers)
+            app._router.stack.push.apply(app._router.stack, error_handlers);
+
+        if(save){
+            plugin.push(extender);
+            var functionToString="[\n";
+            async.eachSeries(plugin,function(obj,callback){
+                functionToString += "   {\n";
+                functionToString += ("      \"resource\":\"") + obj.resource.toString() + "\",\n";
+                functionToString += ("      \"method\":\"") + obj.method.toString() + "\",\n";
+                functionToString += ("      \"mode\":\"") + obj.mode.toString() + "\",\n";
+                functionToString += ("      \"params\":\"") + obj.params.toString() + "\",\n";
+                if(obj.extender && obj.extender.before) {
+                    functionToString += ("      \"extender\":{\n");
+                    functionToString += ("          \"before\":") + obj.extender.before.toString() + ",\n";
+                    functionToString += ("          \"after\":") + obj.extender.after.toString() + "\n";
+                    functionToString += ("      }\n");
+                }else{
+                    functionToString += ("      \"extender\":") + obj.extender.toString() + "\n";
+                }
+                functionToString += "   },\n";
+                callback();
+            },function(err){
+                functionToString=functionToString.slice(0,-2); // remove , and \n
+                functionToString+="\n]";
+                var nfile='var express = require(\'express\');\n\r' +
+                    '\n\r' +
+                    'var plugins=' + functionToString + ';\n\r' +
+                    'module.exports = plugins;';
+
+                fs.writeFile("./plugin/extend.js", nfile, function(err) {
+                    console.log("DONE:" + err);
+                });
+            });
+        }
+    });
 };
