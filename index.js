@@ -13,10 +13,12 @@ function LoadParams(params,req){
 }
 
 
-function writeParams(params,req){
+function writeParams(params,req, beforeParams){
 
     if((typeof  params) ==="object"){
         async.eachOf(params, function(value,key, callback) {
+            if(beforeParams)
+                beforeParams[key]=value;
             req[key]=value;
         });
     }else{
@@ -64,7 +66,7 @@ function extendGet(app,method,ext) {
 
             ext.extender.before(params,null,null,function (err, val) {
                 if(!err) {
-                    writeParams(val, req);
+                    writeParams(val, req, params);
                 }else{
                     res.status(err.error_code).send(err.error_message);
                 }
