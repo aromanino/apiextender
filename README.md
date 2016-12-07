@@ -151,6 +151,7 @@ where:
     +   **after**       : the extension function is executed after the endpoint to extend.
     +   **before_after**: the extension function is executed before and after the endpoint to extend. VERY IMPORTANT --> [Read the note Well](#nb) 
 +   **params**  : An array of strings containing the list or express "request" params to pass at the extender function in the reqParams param.
++   **enabled** : It is an optional boolean parameter, if false this plugin is not enabled by default otherwise if true or not defined the plugin is enabled.
 +   **extender**: Extender function definition with which to extend the endpoint. This function is invoked end executed by 
                   apiextender, and is defined as:  
                   **function(reqParams,content,contentType,callback)**
