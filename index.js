@@ -90,8 +90,7 @@ function extendGet(app,method,ext) {
 
 exports.extend=function(app){
     async.eachSeries(plugin, function(ext, callback) {
-        console.log("XXXXX ENABLED: " + ext.enabled + "XXXXXXX");
-        if(!(ext.enabled===false))
+        if( ext.enabled && (ext.enabled===true))
             extendGet(app,ext.method,ext);
         callback();
     });
