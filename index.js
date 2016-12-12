@@ -67,6 +67,7 @@ function extendGet(app,method,ext) {
             ext.extender.before(params,null,null,function (err, val) {
                 if(!err) {
                     writeParams(val, req, params);
+                    next();
                 }else{
                     res.status(err.error_code).send(err.error_message);
                 }
@@ -82,7 +83,7 @@ function extendGet(app,method,ext) {
                 });
             });
 
-            next();
+
 
         }else next(); // do nothing
     });
