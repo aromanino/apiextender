@@ -53,17 +53,17 @@ function extendGet(app,method,ext) {
             });
         }else if(ext.mode=="after") {
             responseinterceptor.interceptOnFly(req,res,function(body,cType, request, clb){
-                ext.extender(params,body,cType,function (err, val) {
-                    if(!err) {
-                        clb(val);
-                    }else{
-                       // res.status(err.error_code).send(err.error_message);
-                        if(!(req.before_after_error==true)) {
-                            req.before_after_error=true;
+                if(!(req.before_after_error==true)) {
+                    ext.extender(params, body, cType, function (err, val) {
+                        if (!err) {
+                            clb(val);
+                        } else {
+                            req.before_after_error = true;
                             res.status(err.error_code).send(err.error_message);
                         }
-                    }
-                });
+                    });
+                }else
+                    clb(body);
             });
             next();
         } else if(ext.mode=="before_after") {
@@ -79,18 +79,17 @@ function extendGet(app,method,ext) {
             });
 
             responseinterceptor.interceptOnFly(req,res,function(body,cType, request, clb){
-                ext.extender.after(params,body,cType,function (err, val) {
-                    if(!err) {
-                        clb(val);
-                    }else{
-                        //clb(err);
-                        if(!(req.before_after_error==true)) {
-                            req.before_after_error=true;
+                if(!(req.before_after_error==true)) {
+                    ext.extender.after(params, body, cType, function (err, val) {
+                        if (!err) {
+                            clb(val);
+                        } else {
+                            req.before_after_error = true;
                             res.status(err.error_code).send(err.error_message);
                         }
-
-                    }
-                });
+                    });
+                }else
+                    clb(body);
             });
         }else next(); // do nothing
     });
