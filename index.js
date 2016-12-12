@@ -57,7 +57,11 @@ function extendGet(app,method,ext) {
                     if(!err) {
                         clb(val);
                     }else{
-                        res.status(err.error_code).send(err.error_message);
+                       // res.status(err.error_code).send(err.error_message);
+                        if(!(req.before_after_error==true)) {
+                            req.before_after_error=true;
+                            res.status(err.error_code).send(err.error_message);
+                        }
                     }
                 });
             });
@@ -69,6 +73,7 @@ function extendGet(app,method,ext) {
                     writeParams(val, req, params);
                     next();
                 }else{
+                    req.before_after_error=true;
                     res.status(err.error_code).send(err.error_message);
                 }
             });
@@ -78,13 +83,15 @@ function extendGet(app,method,ext) {
                     if(!err) {
                         clb(val);
                     }else{
-                        res.status(err.error_code).send(err.error_message);
+                        //clb(err);
+                        if(!(req.before_after_error==true)) {
+                            req.before_after_error=true;
+                            res.status(err.error_code).send(err.error_message);
+                        }
+
                     }
                 });
             });
-
-
-
         }else next(); // do nothing
     });
 }
