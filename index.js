@@ -59,6 +59,8 @@ function extendGet(app,method,ext) {
                             clb(val);
                         } else {
                             req.before_after_error = true;
+                            if((typeof err.error_message).indexOf("object")<0)
+                                res.setHeader('content-type', 'text/javascript');
                             res.status(err.error_code).send(err.error_message);
                         }
                     });
@@ -85,6 +87,8 @@ function extendGet(app,method,ext) {
                             clb(val);
                         } else {
                             req.before_after_error = true;
+                            if((typeof err.error_message).indexOf("object")<0)
+                                res.setHeader('content-type', 'text/javascript');
                             res.status(err.error_code).send(err.error_message);
                         }
                     });
