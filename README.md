@@ -7,7 +7,7 @@ apiextender let to :
 **apiextender** allow to extend your API with plugin techniques in a **simple and fast** and with **few lines of code**.
 
 
-[![NPM](https://nodei.co/npm/apiextender.png?downloads=true&downloadRank=true&stars=true)][![NPM](https://nodei.co/npm-dl/apiextender.png)](https://nodei.co/npm/apiextender/)
+[![NPM](https://nodei.co/npm/apiextender.png?downloads=true&downloadRank=true&stars=true)![NPM](https://nodei.co/npm-dl/apiextender.png)](https://nodei.co/npm/apiextender/)
 
 * [Installation](#installation) 
 * [Using apiextender](#using)
