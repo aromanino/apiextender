@@ -4,6 +4,8 @@ apiextender let to :
 +   enable third-party developers to create abilities which extend an application
 +   support easily adding new features
 
+[![NPM](https://nodei.co/npm/apiextender.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/apiextender/) [![NPM](https://nodei.co/npm-dl/apiextender.png)](https://nodei.co/npm/apiextender/)
+
 **apiextender** allow to extend your API with plugin techniques in a **simple and fast** and with **few lines of code**.
 
 * [Installation](#installation) 
