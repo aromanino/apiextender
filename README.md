@@ -2,7 +2,7 @@
 This module deals with to extend an API backend that adds a specific feature to an existing API as plugin(add-in, addin, add-on, addon).   
 apiextender let to :
 +   enable third-party developers to create abilities which extend an application
-+   support easily adding new features
++   supports the addition of new features in a simple mode
 
 **apiextender** allow to extend your API with plugin techniques in a **simple and fast** and with **few lines of code**.
 
@@ -919,4 +919,3 @@ Contributors
 ------------
 
 Alessandro Romanino ([a.romanino@gmail.com](mailto:a.romanino@gmail.com))
-Guido Porruvecchio ([guido.porruvecchio@gmail.com](mailto:guido.porruvecchio@gmail.com))
