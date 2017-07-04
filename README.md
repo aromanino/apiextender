@@ -1,11 +1,9 @@
 # apiextender
-This module deals with to extend an API backend that adds a specific feature to an existing API as plugin(add-in, addin, add-on, addon).   
-apiextender let to :
-+   enable third-party developers to create abilities which extend an application
-+   supports the addition of new features in a simple mode
-
-**apiextender** allow to extend your API with plugin techniques in a **simple and fast** and with **few lines of code**.
-
+This module allows to extend an API backend, by adding endpoints or modifying existing endpoints' behaviour.
+  This is accomplished in a plug-in fashion.
+With apiextender you can :
++   enable third-party developers to create functionalities extending an application
++   support the addition of new features in a simple way
 
 [![NPM](https://nodei.co/npm/apiextender.png?downloads=true&downloadRank=true&stars=true)![NPM](https://nodei.co/npm-dl/apiextender.png?months=6&height=3)](https://nodei.co/npm/apiextender/)
 
@@ -29,18 +27,18 @@ apiextender let to :
     
 
 ## <a name="installation"></a>Installation
-To use **apiextender** install it in your project by typing:
+Install **apiextender** in your project by typing:
 
 ```shell
 $ npm install apiextender
 ```
 
 
-## <a name="using"></a>Using apiextender
-This is an express module for nodejs and now we explain how to use it in you code to make your API extensible by plugin.
+## <a name="using"></a>Usage
+This is an Express module for nodeJs. This section explains how to use it in your code to make your API extensible by plugin.
 
 ### Include apiextender
-Just require it like a simple package:
+Just require it:
 ```javascript
 var apiextender = require('apiextender');
 ```
@@ -57,43 +55,38 @@ var app=express();
 apiextender.extend(app);  // now your API is exensible
 ```
 
-## <a name="folder"></a>Make your environment capable to accept plugins functions
-Plugin functions to extend API must be defined in a file called extend.js in a folder named plugin in the home directory of your application.
-extend.js contains an array of plugin functions. 
+## <a name="folder"></a>Make your environment compliant to plugins
+Plugin functions that extends your API must be defined in a file called ```extend.js```, 
+located in a folder named ```plugin``` in the home directory of your application.
 
-### Create Folder where save plugin functions
+### Create plugin folder
 To create folder type:
 ```shell
 $ mkdir plugin
 ```
-### Create extend.js plugin functions container
-To create extend.js type:
+### Create plugin file container
+To create ```extend.js``` type:
 ```shell
 $ cd plugin
 $ vi extend.js
 ```
 
-extend.js contains an array of plugin functions so now we initialize it as an empty plugin function container.   
-Insert in the file this contents
+```extend.js``` contains an array of plugin functions. Now we initialize it as an empty plugin function container:
 ```javascript
 var plugins=[];
 module.exports = plugins;
 ```
-**to see how to write plugin function read the section [How to write function that extends the "API"](#howto)**
   
 
-## <a name="howto"></a>How to write function that extends the "API" 
-To extend an API endpoint you must populate the extend.js file and more specifically the array plugins containing a
-list of functions that extends the "API".
+## <a name="howto"></a>Write your functions that extend the API 
+To extend an API endpoint, you must populate the ```plugins``` array containing all functions extending the API.
 
 ### extend.js structure
-extend.js is defined as:  
 ```javascript
 var plugins=[];
 module.exports = plugins;
 ```
-**`plugins=[{function_extension(s)}]`** is an array of function_extension(s) object , where each function_extension(s) object is a plugin.
-function_extension(s) are defined as the example below:
+**`plugins=[]`** is an array of objects , which are functions that constitutes a plugin. Each function is defined as:
 ```javascript
 {
     "resource":"/resourceToExtend",
@@ -106,7 +99,69 @@ function_extension(s) are defined as the example below:
 }
 ``` 
 
-Next an example of extend.js plugin extension definition. It extend "/resourceToExtend" and "/OtherresourceToExtend" resources
+ * URI: URI of the resource to protect
+ * method: HTTP method used to call the resource to protect
+ * authToken : An array of Strings containing the token types authorized by this role
+
+where:
+*   **resource**: URI of the resource to extend
+*   **method**  : HTTP method of the resource to extend
+*   **mode**    : Mode defining how the resource must be extended. There are four
+                  different possible modes: ```override```, ```before```, ```after```, ```before_after```. In detail:
+    *   **override**    : overrides the original endpoint definition
+    *   **before**      : the plugin function is executed before the original endpoint
+    *   **after**       : the plugin function is executed after the original endpoint
+    *   **before_after**: the plugin function is executed both before and after the original endpoint
+    
+*   **params**  : Array of the fields of Express ```req``` object that must be passed to the plugin function in ```reqParams``` param
+*   **enabled** : Optional boolean parameter indicating if the plugin is enabled or not. Default is disabled
+*   **extender**: Plugin function definition. This function is invoked end executed by apiextender, defined as:  
+                  ```function(reqParams,content,contentType,callback)```
+    *   **reqParams**   : Object containing the Express request params defined in ```params``` field. 
+                          E.g. if ```params=["query"]```,  ```reqParams``` contains the object ```{query:req.query}```
+    *   **content**     : Response of the original endpoint when ```mode``` param is set to ```after``` or ```before_after```.  
+                          Null when mode is set to ```override``` or ```before```
+    *   **contentType** : Content Type of ```content```, e.g. ```application/json``` , ```text/html```...  
+                          Null when mode is set to ```override``` or ```before```  
+    *   **callback**    : callback function to apiextender. It must be invoked with params ```error``` and ```newContent```, defined as:  
+                          ```callback(error,newContent)```
+        *   **error** : If an error occurs, apiextender stops the request execution and sends a response to the client
+                                        with this object, that must have two fields:
+            *   **error_code**      : HTTP status code
+            *   **error_message**   : error message content   
+        *   **newContent** : response sent to the client if mode is ```override```, ```after``` or ```before_after``` 
+                                (for the latter, only for what is executed in the ```after``` part). <br>
+                             If mode is set to ```before``` or ```before_after``` 
+                             (for the latter, only for what is executed in the ```before``` part), it is an
+                             object whose keys are appended to Express' ```req``` .    
+    
+####<a name="nb"></a> Warning: 
+If `mode` is set to `before_after`, it is mandatory to declare in `extender` param two functions, 
+                        both for the `before` and `after` actions. 
+                       So the `extender` parameter is not a function but an object containing two keys: 
+*   **before**: the function definition for `before` actions
+*   **after** : the function definition for `after` actions
+
+######Example
+```javascript
+{
+    //.... 
+    //.... 
+    "mode":"before_after"
+    "extender":{ 
+            "before": function(req,content,cType,callback){
+                // before logic
+                callback(null,{"Content extension before"});
+            },
+            "after": function(req,content,cType,callback){
+                // after logic
+                callback(null,{"Content extension after"});
+            }
+    }
+}
+``` 
+
+######Example of extend.js plugin definition
 ```javascript
 var plugins=[
     {
@@ -130,97 +185,26 @@ var plugins=[
 ]             
 ``` 
 
-### <a name="functionextension"></a>function_extension(s) structure
-function_extension(s) are defined as:
-```javascript
-{
-    "resource":"/resourceToExtend",
-    "method":"GET",
-    "mode":"override",
-    "params":[query],
-    "extender": function(req,content,cType,callback){
-            callback(null,{"Content extension"});
-    }
-}
-``` 
-
-where:
-+   **resource**: A string containing the resource URI to Extend
-+   **method**  : A string containing the the resource method to Extend
-+   **mode**    : A string containing the mode on which the resource must be extended. There are four
-                  different possible mode values **"override", "before", "after", "before_after"** where:
-    +   **override**    : override the original endpoint definition.
-    +   **before**      : the extension function is executed before the endpoint to extend.
-    +   **after**       : the extension function is executed after the endpoint to extend.
-    +   **before_after**: the extension function is executed before and after the endpoint to extend. VERY IMPORTANT --> [Read the note Well](#nb) 
-+   **params**  : An array of strings containing the list or express "request" params to pass at the extender function in the reqParams param.
-+   **enabled** : It is an optional boolean parameter, if false this plugin is not enabled by default otherwise if true or not defined the plugin is enabled.
-+   **extender**: Extender function definition with which to extend the endpoint. This function is invoked end executed by 
-                  apiextender, and is defined as:  
-                  **function(reqParams,content,contentType,callback)**
-    +   **reqParams**   : An Object containing the express request params defined in "params" field. For example if :  
-                        params=["query"] ---> it contains an object as {query:QueryParams} where QueryParams==req.query.
-    +   **content**     : Contains the content of the original endpoint response when "mode" param is set to "after" or "before_after".  
-                          It is "null" when mode is set to "override" or "before".
-    +   **contentType** : String that describe the contentType in content. For example "application/json" , "text/html" , "text/css" ...  
-                          It is "null" when mode is set to "override" or "before".  
-    +   **callback**    : callback function to apiextender. It must be invoked with two params **"error"** and **"newContent"**  
-                          The function **callback(error,newContent)** definition
-        +   error : null if no error, otherwise If an error occurs in your extender function, you can throw it to apiexender setting error as an object containing
-                    two keys :
-            +   **error_code**      : containing the http status code to send to the client(es 204, 400, 404, 500).
-            +   **error_message**   : String or object containing content or message to send to the client.   
-                    If error is not **null** when callback is invoked, apiextender stops the request execution and send a response to the client with this object error.
-        +   newContent : The new content to send to the client if the mode is set to "override", "after" or "before_after", or the content to
-                         add to the express request(req) to be thrown to apiextender if  mode is set to "before".
-    
-
-####<a name="nb"></a> `NB`: If `mode` is set to "before_after", is mandatory to declare in `extender` param two function, one for actions "before" and one other for actions "after". So the `extender` parameter is not a declaration function but an object containing two keys: 
-+   **before**: the function declaration for "before" actions
-+   **after** : the function declaration for "after" actions
-
-Here an example
-```javascript
-{
-    //.... 
-    //.... 
-    "mode":"before_after"
-    "extender":{ 
-            "before": function(req,content,cType,callback){
-                // before logic
-                callback(null,{"Content extension before"});
-            },
-            "after": function(req,content,cType,callback){
-                // after logic
-                callback(null,{"Content extension after"});
-            }
-    }
-}
-``` 
 
 ## <a name="reference"></a>Reference
 ### <a name="extend"></a>`extend(app)` 
-This is the function that allow to make your "API" extensible. 
-The param `app` is the application that you want extend.  
+Function that extends the API. The param `app` is the application that you want extend.  
 
 ### <a name="install"></a>`install(app,extender,save)` 
-This is a function suite that allow you to extend an API at runtime without stop and restart you application.
-It lets you don't stop your application to write the plugin extender function in extender.js file.  
-The param `app` is the application that you want extend  
-The param `extender` is the extender plugin function defined as in section [plugin extender structure](#functionextension)  
-The param `save` if "true" the extender plugin is saved in the extend.js file then it becomes permanent otherwise if "false" the plugin function
-is installed but not saved so when application is stopped and restarted the extender plugin extension is not reloaded.
-Example:
+Function that extends an API at runtime, without stopping and restarting your application.
+* `app` is the application that you want extend  
+* `extender` is the plugin function described in section [plugin extender structure](#functionextension)  
+* `save` if true, the plugin is saved in the `extend.js` file, being appended in the `plugin` array and becoming permanent.
+
+######Example:
 ```javascript
 var express=require('express'); 
 var apiextender = require('apiextender');
 var app=express();
-   
-// make your API extensible by plugin techniques in a simple and fast 
-// and with one line of code. 
-apiextender.extend(app);  // now your API is exensible
 
-// Define an endpoint that wrap apiextender install function that lets you to extend API on the fly
+apiextender.extend(app);  // now your API is extensible
+
+// Define an endpoint wrapping apiextender install function that lets you to extend API on the fly
 // The access to this endpoint should be protectd with token privileges
 app.post("/installPlugin",function(req,res,next){
     // check for tokens
@@ -235,7 +219,7 @@ app.post("/installPlugin",function(req,res,next){
 
 ## <a name="examples"></a>`Examples`
 ### <a name="examplesapi"></a>`Examples: How to set an API extensible by plugins`
-From a shell, go in your application home directory and type de follow commands:
+From your application home directory type:
 ```shell
 $ cd /Your_App_Home
 $ npm install apiextender   // install apiextender
@@ -245,28 +229,24 @@ $ vi extend.js              // Create plugin container file
 ```
 
 
-Insert this content in the file extend.js then save and exit. You have defined the plugin extender structure( void list of plugin )
+Insert this content in `extend.js`.
 ```javascript
-// insert the follow content to init the system to accept plugin function
-// At the moment no plugin function are defined so the plugin list is void.
 var plugins=[];
 module.exports = plugins; 
 ``` 
 
-Now from your app.js include the apiextender module.
+Include the apiextender module in `app.js`
 ```javascript
 var express=require('express'); 
 var apiextender = require('apiextender');
 var app=express();
 
-apiextender.extend(app);  // now your API is exensible
+apiextender.extend(app); 
 ``` 
 
-Now You API is ready to be extensible with plugin functions. To write plugin functions see example bellow and read the section [How to write function that extends the "API"](#howto) 
+### <a name="examplesplugin"></a>`Examples: How to extend an API`
 
-### <a name="examplesplugin"></a>`Examples: How to write extensible plugin functions`
-
-Suppose we want extend this API
+Suppose we want to extend this API:
 ```javascript
 var express=require('express'); 
 var apiextender = require('apiextender');
@@ -292,8 +272,8 @@ var params=req.optionalParams || null;
 });
 ``` 
 
-#### <a name="exampleoverride"></a>`Examples: override mode`
-With no extension plugin function defined, if we test it with curl we have:
+#### <a name="exampleoverride"></a>`Override mode`
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal
  X-Powered-By: Express
@@ -307,7 +287,7 @@ With no extension plugin function defined, if we test it with curl we have:
  $ 
 ```
 
-Now we extend "/overrideOriginal" endpoint with a plugin. To do it we write a plugin function in extend.js 
+Now we extend "/overrideOriginal" endpoint with a plugin, writing a plugin function in `extend.js`
 ```javascript
 var plugins=[
     {
@@ -328,8 +308,8 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
-is not executed and overridden by extension plugin function:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is not executed, being overridden by the plugin function:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal
  X-Powered-By: Express
@@ -345,8 +325,8 @@ is not executed and overridden by extension plugin function:
 ```
 
 
-#### <a name="examplebefore"></a>`Examples: before mode`
-With no extension plugin function defined, if we test it with curl we have:
+#### <a name="examplebefore"></a>`Before mode`
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/beforeOriginal
  X-Powered-By: Express
@@ -359,7 +339,7 @@ With no extension plugin function defined, if we test it with curl we have:
  {"response":"before"} // original response because no extension function
 ```
 
-Now we extend "/beforeOriginal" endpoint with a plugin. To do it we write a plugin function in extend.js 
+Now we extend "/beforeOriginal" endpoint with a plugin, writing a plugin function in `extend.js`
 ```javascript
 var plugins=[
     {
@@ -380,8 +360,9 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
-is extended by plugin function:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is extended by the plugin function:
+
 ```shell 
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/beforeOriginal?username=Alex
  X-Powered-By: Express
@@ -395,8 +376,8 @@ is extended by plugin function:
 ```
 
 
-#### <a name="exampleafter"></a>`Examples: after mode`
-With no extension plugin function defined, if we test it with curl we have:
+#### <a name="exampleafter"></a>`After mode`
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/afterOriginal
  X-Powered-By: Express
@@ -418,7 +399,7 @@ Connection: keep-alive
 {"response":"after"} // original response because no extension function
 ```
 
-Now we extend "/afterOriginal" endpoint with a plugin. To do it we write a plugin function in extend.js 
+Now we extend "/afterOriginal" endpoint with a plugin, writing a plugin function in `extend.js`
 ```javascript
 var plugins=[
     {
@@ -442,8 +423,9 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
-is extended by plugin function:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is extended by the plugin function:
+
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/afterOriginal
  X-Powered-By: Express
@@ -467,7 +449,7 @@ Connection: keep-alive
 
 
 #### <a name="examplebefore_after"></a>`Examples: before_after mode`
-With no extension plugin function defined, if we test it with curl we have:
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/before_afterOriginal
  X-Powered-By: Express
@@ -489,7 +471,7 @@ Connection: keep-alive
 {"response":"before_after"} // original response because no extension function
 ```
 
-Now we extend "/before_afterOriginal" endpoint with a plugin. To do it we write a plugin function in extend.js 
+Now we extend "/before_afterOriginal" endpoint with a plugin, writing a plugin function in `extend.js`
 ```javascript
 var plugins=[
     {
@@ -522,8 +504,8 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
-is extended by plugin function:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is extended by the plugin function:
 ```shell 
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/before_afterOriginal
 X-Powered-By: Express
@@ -555,8 +537,8 @@ Connection: keep-alive
 ```
 
 
-#### <a name="exampleerror"></a>`Examples: extend throwing error`
-With no extension plugin function defined, if we test it with curl we have:
+#### <a name="exampleerror"></a>`Error throwing`
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/beforeOriginal
  X-Powered-By: Express
@@ -578,14 +560,14 @@ With no extension plugin function defined, if we test it with curl we have:
   
   {"response":"before"} // original response because no extension function
 ```
-Now we extend "/overrideOriginal" endpoint with a plugin. To do it we write a plugin function in extend.js. Starting from above 
-example [`Examples:before mode`](#examplebefore) we edit the plugin function to throw an error if no username field is sent. 
+Now we extend "/beforeOriginal" endpoint with a plugin, writing a plugin function in `extend.js`. Starting from the 
+example [`Examples:before mode`](#examplebefore), we edit the plugin function to throw an error if no `username` field is sent. 
 ```javascript
 var plugins=[
     {
-        "resource":"/overrideOriginal",  // extend overrideOriginal endpoint
-        "method":"GET",                  // extend overrideOriginal endpoint in get method  
-        "mode":"before",                 // endpoint overrideOriginal must be overrided   
+        "resource":"/beforeOriginal",  // extend beforeOriginal endpoint
+        "method":"GET",                  // extend beforeOriginal endpoint in get method  
+        "mode":"before",                 // endpoint beforeOriginal must be overrided   
         "params":[query],                // express request "req.query" should be throw to extender function 
         "extender": function(requestParams,content,cType,callback){   // this is the extender Function definition
             // the mode is set to "override" so "content,cType" are both null
@@ -603,9 +585,11 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make a test with curl. You can see that original endpoint
-is not executed after extension function if no username field is sent because "before extension function" stops execution with an error message to 
-thr apiextender callback:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is not executed after the plugin function,
+because no username field is sent. This is due to the fact that `before extension` function stops the execution 
+with an error message to the apiextender callback:
+
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/beforeOriginal
  X-Powered-By: Express
@@ -629,8 +613,8 @@ thr apiextender callback:
 ```
 
 
-#### <a name="examplecomplete"></a>`Examples: A Complete Example of plugin extension`
-With no extension plugin function defined, if we test it with curl we have:
+#### <a name="examplecomplete"></a>`Examples: A Complete Eexample of plugin extension`
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal?username=Alex
  X-Powered-By: Express
@@ -673,7 +657,8 @@ Connection: keep-alive
 {"response":"before_after"} // original response because no extension function
 ```
 
-Now we extend "....Original" endpoint with a plugin. To do it we write a plugin function in extend.js 
+Now we extend "/....Original" endpoint with a plugin, writing a plugin function in `extend.js`. 
+
 ```javascript
 var plugins=[
     {
@@ -754,8 +739,8 @@ var plugins=[
 module.exports = plugins;
 ``` 
 
-now shutdown and restart your application (or invoke apiextender.install) to apply plugin function extension and make the same test with curl. You can see that original endpoint
-is extended by plugin function:
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+If you curl the endpoint, you can notice that the original endpoint is extended by the plugin function:
 ```shell 
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal?username=Alex
 X-Powered-By: Express
@@ -805,9 +790,9 @@ Connection: keep-alive
 
 
 
-#### <a name="exampleonFly"></a>`Example: Extend API on the fly at runtime`
-To extend an api on the fly as described in reference section [install(app,extender,save)](#install) we need to define an
-endpoint that wrap apiextender install function. To do it add the fee code lines to you app.js:
+#### <a name="exampleonFly"></a>`Extend API on the fly at runtime`
+To extend an API on the fly as described in reference section [install(app,extender,save)](#install), we need to define an
+endpoint that wraps apiextender install function. Add these code lines to you app.js:
 ```javascript
 var express=require('express'); 
 var apiextender = require('apiextender');
@@ -828,7 +813,7 @@ app.post("/installPlugin",function(req,res,next){
 });
 ```
 
-With no extension plugin function defined, if we test it with curl we have:
+With no plugin function defined, the endpoint response is:
 ```shell
  $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal?username=Alex
  X-Powered-By: Express
@@ -841,8 +826,8 @@ With no extension plugin function defined, if we test it with curl we have:
  {"response":"override"} // original response because no extension function
 ```
 
-Now we extend "overrideOriginal" endpoint with a plugin function installed on fly without define it in extend.js. we call 
-"/installPlugin" end point in post method:
+Now we extend "/overrideOriginal" endpoint with a plugin, installed on the fly without defining it in `extend.js`.
+To install, just call `/installPlugin` in POST:
 ```shell
 EXTENDER='{
             "pluginExtender":{
@@ -875,8 +860,12 @@ Connection: keep-alive
 {"status":"installed"} // plugin extension installed
 ```
 
-now **without shutdown** and restart your application make the same test with curl. You can see that original endpoint
-is extended by plugin function:
+
+Restart your application (or invoke `apiextender.install`) to apply the plugin function.
+
+
+
+**Without restarting** your application, if you curl the endpoint, you can notice that the original endpoint is extended by the plugin function:
 ```shell 
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://hostname/overrideOriginal?username=Alex
 X-Powered-By: Express
@@ -890,8 +879,6 @@ Connection: keep-alive
                                                                    // overrided by extension function
 $
 ```
-
-### File Properties creation
 
 License - "MIT License"
 -----------------------
@@ -918,7 +905,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Contributors
-------------
+Author
+------
+Alessandro Romanino ([a.romanino@gmail.com](mailto:a.romanino@gmail.com))<br>
+Guido Porruvecchio ([guido.porruvecchio@gmail.com](mailto:guido.porruvecchio@gmail.com))
 
-Alessandro Romanino ([a.romanino@gmail.com](mailto:a.romanino@gmail.com))
+Contributors
+------
+CRS4 Microservice Core Team ([cmc.smartenv@crs4.it](mailto:cmc.smartenv@crs4.it))
