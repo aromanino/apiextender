@@ -62,6 +62,10 @@ function setErrorResponse(res,err){
             errorString=err.error_code;
             break;
     }
+
+    if((typeof err.error_message) === 'object')
+        err.error_message=JSON.stringify(err.error_message);
+
     res.status(err.error_code).send({error:errorString, error_message:err.error_message});
 }
 
