@@ -27,6 +27,45 @@ function writeParams(params,req, beforeParams){
 }
 
 
+function setErrorResponse(res,err){
+    var errorString="";
+    switch(err.error_code) {
+        case 400:
+            errorString="Bad Request";
+            break;
+
+        case 401:
+            errorString="Unauthorized";
+            break;
+
+        case 403:
+            errorString="Forbidden";
+            break;
+
+        case 404:
+            errorString="Not Found";
+            break;
+
+        case 409:
+            errorString="Conflict";
+            break;
+
+        case 500:
+            errorString="Internal Server Error";
+            break;
+
+        case 504:
+            errorString="Gateway Timeout";
+            break;
+
+        default:
+            errorString=err.error_code;
+            break;
+    }
+    res.status(err.error_code).send({error:errorString, error_message:err.error_message});
+}
+
+
 
 function extendGet(app,method,ext) {
     method=method.toLocaleLowerCase();
@@ -39,7 +78,7 @@ function extendGet(app,method,ext) {
                     res.send(val);
                 }
                 else{
-                    res.status(err.error_code).send(err.error_message);
+                    setErrorResponse(res,err);
                 }
             });
         } else if(ext.mode=="before") {
@@ -48,7 +87,7 @@ function extendGet(app,method,ext) {
                     writeParams(val, req);
                     next();
                 }else{
-                    res.status(err.error_code).send(err.error_message);
+                    setErrorResponse(res,err);
                 }
             });
         }else if(ext.mode=="after") {
@@ -61,7 +100,7 @@ function extendGet(app,method,ext) {
                             req.before_after_error = true;
                             if((typeof err.error_message).indexOf("object")<0)
                                 res.setHeader('content-type', 'text/javascript');
-                            res.status(err.error_code).send(err.error_message);
+                            setErrorResponse(res,err);
                         }
                     });
                 }else
@@ -76,7 +115,7 @@ function extendGet(app,method,ext) {
                     next();
                 }else{
                     req.before_after_error=true;
-                    res.status(err.error_code).send(err.error_message);
+                    setErrorResponse(res,err);
                 }
             });
 
@@ -89,7 +128,7 @@ function extendGet(app,method,ext) {
                             req.before_after_error = true;
                             if((typeof err.error_message).indexOf("object")<0)
                                 res.setHeader('content-type', 'text/javascript');
-                            res.status(err.error_code).send(err.error_message);
+                            setErrorResponse(res,err);
                         }
                     });
                 }else
